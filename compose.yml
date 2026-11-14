@@ -1,6 +1,6 @@
 services:
     mariadb:
-        image: mariadb:11
+        build: ./requirements/mariadb
         environment: 
             MARIADB_ROOT_PASSWORD: "root123"
             MARIADB_DATABASE: "wordpress"
