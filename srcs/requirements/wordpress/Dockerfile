@@ -46,12 +46,12 @@ RUN curl -fsSL -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/bui
 # Bu satır o ayarı listen = 9000 ile değiştiriyor, yani TCP 9000 portunda dinle.
 # Neden? MariaDB’den hatırla: Unix socket sadece aynı container içinden kullanılabilir. NGINX ise başka bir container’da, ona network üzerinden, yani TCP ile ulaşması gerekiyor. MariaDB’deki bind-address değişikliğinin aynısı.
 # sed -i 's|eski|yeni|': dosyada “eski” metni bul ve “yeni” ile değiştir. -i değişikliği dosyanın üzerine yazar. Ayırıcı olarak / yerine | kullandık, çünkü metnin içinde zaten / karakterleri var.
-RUN sed -i 's|listen = /run/php/php8.2-fpm.sock|listen = 9000|' /etc/php/8.2/fpm/pool.d/www.conf
+RUN sed -i 's|listen = /run/php/php8.2-fpm.sock|listen = 9000|' /etc/php/8.2/fpm/pool.d/www.conf \
+    && mkdir -p /run/php
 
-# Container başlayınca PHP-FPM’i çalıştır.
-# -F (foreground): PHP-FPM normalde başlayınca arka plana geçip kendi kendini daemon yapar. O zaman PID 1 olan süreç hemen biter ve container kapanır. -F “ön planda kal” demek, böylece PID 1 olarak kalır. MariaDB’de konuştuğumuz PID 1 kuralının aynısı.
-CMD ["php-fpm8.2", "-F"]
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
+EXPOSE 9000
 
-
-# İlk RUN “paketleri kur ve WordPress’i indir” işini yapıyor.
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
